@@ -1,0 +1,37 @@
+{
+  "name": "arslan-bot",
+  "version": "2.0.0",
+  "description": "WhatsApp Bot Base",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^v7.0.0-rc.9",
+    "axios": "latest",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "latest",
+    "express": "^4.18.2",
+    "node-fetch": "^2.7.0",
+    "sharp": "^0.32.6",
+    "path": "^0.12.7",
+    "jimp": "1.6.1",
+    "ytdl-core": "^4.11.5",
+    "node-telegram-bot-api": "^0.66.0",
+    "fs-extra": "^11.2.0",
+    "pino": "^8.17.0",
+    "@octokit/rest": "^20.0.2",
+    "child_process": "^1.0.2",
+    "denethdev-ytmp3": "1.0.3",
+    "cheerio": "latest",
+    "ruhend-scraper": "9.0.1",
+    "yt-search": "2.12.1",
+    "fluent-ffmpeg": "^2.1.2",
+    "wa-sticker-formatter": "^4.4.4",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "file-type": "21.0.0",
+    "mongoose": "^8.0.0",
+    "moment-timezone": "^0.6.0"
+  }
+}
