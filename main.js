@@ -102,7 +102,7 @@ function getConnectionStatus(number) {
 
 function arslanLog(message, type = 'info') {
     const icons = { info: '📝', success: '✅', error: '❌', warning: '⚠️', debug: '🐛' };
-    console.log(`${icons[type] || '📝'} [ARSLAN-MD] ${new Date().toISOString()}: ${message}`);
+    console.log(`${icons[type] || '📝'} [ARSLAN-MD-MINI] ${new Date().toISOString()}: ${message}`);
 }
 
 // Load Plugins
@@ -467,7 +467,7 @@ async function arslanPair(number, res = null) {
         });
 
     } catch (err) {
-        arslanLog(`ARSLAN-MD Pair error: ${err.message}`, 'error');
+        arslanLog(`ARSLAN-MD-MINI Pair error: ${err.message}`, 'error');
         if (res && !res.headersSent) return res.json({ error: 'Internal Server Error', details: err.message });
     } finally {
         if (connectionLockKey) global[connectionLockKey] = false;
