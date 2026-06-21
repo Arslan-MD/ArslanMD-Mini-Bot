@@ -1,7 +1,7 @@
 {
   "name": "arslan-bot",
   "version": "2.0.0",
-  "description": "WhatsApp Bot Base",
+  "description": "WhatsApp Bot Base Created By ArslanMD Official",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
@@ -10,7 +10,7 @@
     "@whiskeysockets/baileys": "^v7.0.0-rc13",
     "axios": "latest",
     "body-parser": "^1.20.2",
-    "cors": "^2.8.5",
+    "cors": "latest",
     "dotenv": "latest",
     "express": "^4.18.2",
     "node-fetch": "^2.7.0",
@@ -26,7 +26,7 @@
     "denethdev-ytmp3": "1.0.3",
     "cheerio": "latest",
     "ruhend-scraper": "9.0.1",
-    "yt-search": "2.12.1",
+    "yt-search": "latest",
     "fluent-ffmpeg": "^2.1.2",
     "wa-sticker-formatter": "^4.4.4",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
