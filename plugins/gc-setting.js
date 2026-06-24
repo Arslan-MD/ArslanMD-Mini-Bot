@@ -226,52 +226,58 @@ async (conn, mek, m, { from, isGroup, isAdmins, isBotAdmins, reply }) => {
 
 });
 // ==================== SIMPLE & WORKING KICKALL COMMAND ====================
+// ── KICK ALL ──
 cmd({
-    pattern: "kickall",
-    desc: "Remove all non-admin members",
-    category: "admin",
-    react: "⚠️",
-    filename: __filename
-},
-async (Void, citel) => {
+    pattern: 'kickall',
+    desc: 'Kick all members from the group (except admins)',
+    category: 'group',
+    react: '🦵'
+}, async (conn, mek, m, { from, isGroup, isBotAdmins, isAdmins, isOwner, participants, groupAdmins, reply }) => {
     try {
+        if (!isGroup) return reply('*❌ Group only command.*');
+        if (!isOwner && !isAdmins) return reply('*❌ Only admins can use kickall.*');
+        if (!isBotAdmins) return reply('*❌ I need to be an admin to kick members.*');
 
-        if (!citel.isGroup)
-            return citel.reply("❌ Group command only!");
+        const members = participants.filter(p => !groupAdmins.includes(p.id));
+        if (!members.length) return reply('*❌ No regular members to kick.*');
 
-        const metadata = await Void.groupMetadata(citel.chat);
-        const participants = metadata.participants;
+        await reply(`*🦵 Kicking ${members.length} members...*`);
 
-        // admins list
-        const admins = participants
-            .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
-            .map(p => p.id);
-
-        // sender admin check
-        if (!admins.includes(citel.sender))
-            return citel.reply("❌ Only admins can use this!");
-
-        // bot jid
-        let botJid = Void.user.id.includes(':')
-            ? Void.user.id.split(':')[0] + "@s.whatsapp.net"
-            : Void.user.id;
-
-        // remove list (admins skip)
-        const toKick = participants
-            .map(p => p.id)
-            .filter(id => !admins.includes(id) && id !== botJid);
-
-        await citel.reply(`⚠️ Removing ${toKick.length} members...`);
-
-        for (let user of toKick) {
-            await Void.groupParticipantsUpdate(citel.chat, [user], "remove");
+        for (const member of members) {
+            try {
+                await conn.groupParticipantsUpdate(from, [member.id], 'remove');
+                await new Promise(r => setTimeout(r, 500));
+            } catch (_) {}
         }
 
-        await citel.reply("✅ Kickall completed!");
+        await reply(`*✅ Done! Kicked ${members.length} members.*`);
+    } catch (e) {
+        reply('*❌ Error: ' + e.message + '*');
+    }
+});
 
-    } catch (err) {
-        console.log(err);
-        citel.reply("❌ Kickall failed!");
+// ── TAG ALL ──
+cmd({
+    pattern: 'tagall',
+    alias: ['mentionall'],
+    desc: 'Tag all group members',
+    category: 'group',
+    react: '📢'
+}, async (conn, mek, m, { from, isGroup, isBotAdmins, isAdmins, isOwner, participants, args, reply }) => {
+    try {
+        if (!isGroup) return reply('*❌ Group only command.*');
+        if (!isOwner && !isAdmins) return reply('*❌ Only admins can tag all.*');
+
+        const text = args.join(' ') || '📢 Attention everyone!';
+        const mentions = participants.map(p => p.id);
+        const mentionText = mentions.map(m => `@${m.split('@')[0]}`).join(' ');
+
+        await conn.sendMessage(from, {
+            text: `*${text}*\n\n${mentionText}`,
+            mentions
+        }, { quoted: mek });
+    } catch (e) {
+        reply('*❌ Error: ' + e.message + '*');
     }
 });
 //REMOVE ADMINS BY ARSLAN-MD OFFICIAL 
