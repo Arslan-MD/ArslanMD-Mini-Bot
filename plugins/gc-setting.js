@@ -712,47 +712,6 @@ reply("❌ Error: " + (err.message || "Unknown error"));
 }
 });
 
-// ==================== SIMPLE TAGALL COMMAND ====================
-cmd({
-pattern: "tagall",
-alias: ["gc_tagall", "mentionall"],
-desc: "Tag all members",
-category: "group",
-react: "🔊",
-filename: __filename
-}, async (conn, mek, m, {
-from,
-participants,
-reply,
-isGroup,
-body,
-command
-}) => {
-try {
-if (!isGroup) return reply("⚠️ This command only works in groups.");
-
-let message = body.slice(body.indexOf(command) + command.length).trim();  
-if (!message) message = "Attention Everyone!";  
-  
-let text = `📢 *TAG ALL*\n\n📝 Message: ${message}\n\n`;  
-  
-participants.forEach((member, i) => {  
-  text += `${i+1}. @${member.id.split('@')[0]}\n`;  
-});  
-  
-text += `\n✅ Total: ${participants.length} members`;  
-  
-await conn.sendMessage(from, {  
-  text: text,  
-  mentions: participants.map(p => p.id)  
-}, { quoted: fakevCard });
-
-} catch (err) {
-console.error("TagAll Error:", err);
-reply("❌ Error in tagall: " + err.message);
-}
-});
-
 //tag.js
 
 cmd({
