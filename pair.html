@@ -1,429 +1,452 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Arslan MD · Pair Code</title>
-  <!-- Google Font & Font Awesome for icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <style>
-    /* ----- RESET & BASE ----- */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>👑 Arslan MD 👑</title>
 
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: #0b0b0e;
-      padding: 1.5rem;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-    /* ----- MAIN CARD (GLASS / DARK) ----- */
-    .card {
-      width: 100%;
-      max-width: 440px;
-      background: rgba(10, 10, 14, 0.85);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      border-radius: 40px;
-      padding: 2.2rem 1.8rem 2rem;
-      text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      box-shadow: 0 25px 50px -8px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.03);
-      transition: all 0.3s;
-    }
+<style>
+/* ===============================
+   ORIGINAL STRUCTURE - UPGRADED VISUALS
+   =============================== */
 
-    /* ----- RAINBOW TEXT (ANIMATED) ----- */
-    .rgb-text {
-      background: linear-gradient(90deg, #ff4d6d, #ffb347, #f9d342, #5fdc7a, #4db8ff, #b47bff, #ff6fcf, #ff4d6d);
-      background-size: 300% 100%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: rgbFlow 6s linear infinite;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-    @keyframes rgbFlow {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 300% 50%; }
-    }
+:root {
+    --rgb-speed: 16s;
+    --glass-bg: rgba(0, 0, 0, 0.85);
+    --border-glow: rgba(255, 255, 255, 0.08);
+}
 
-    /* ----- TITLES ----- */
-    .main-title {
-      font-size: 2.2rem;
-      font-weight: 700;
-      margin-bottom: 0.15rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.3rem;
-    }
-    .main-title i {
-      -webkit-text-fill-color: initial;
-      color: #fbbf24;
-      font-size: 1.8rem;
-    }
-    .sub-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-top: -0.2rem;
-      margin-bottom: 0.7rem;
-      letter-spacing: -0.01em;
-    }
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    background: #0a0a0f;
+    color: #fff;
+    padding: 20px;
+    background-image: 
+        radial-gradient(ellipse at 20% 50%, rgba(120, 80, 255, 0.05) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 50%, rgba(255, 80, 120, 0.05) 0%, transparent 60%);
+}
 
-    .status-label {
-      font-size: 0.8rem;
-      font-weight: 500;
-      letter-spacing: 0.4px;
-      text-transform: uppercase;
-      opacity: 0.8;
-      margin: 0.8rem 0 1rem;
-    }
+/* Card */
+.card {
+    width: 90%;
+    max-width: 420px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 28px;
+    padding: 32px 24px 28px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 
+        0 30px 80px rgba(0, 0, 0, 0.8),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    transition: all 0.3s;
+}
 
-    /* ----- INPUT CONTAINER (RGB BORDER) ----- */
-    .rgb-container {
-      padding: 2.5px;
-      border-radius: 20px;
-      background: linear-gradient(90deg, #ff4d6d, #ffb347, #f9d342, #5fdc7a, #4db8ff, #b47bff, #ff6fcf, #ff4d6d);
-      background-size: 250% 100%;
-      width: 100%;
-      max-width: 340px;
-      margin: 0 auto 1.1rem auto;
-      transition: all 0.2s;
-      box-shadow: 0 0 15px rgba(255, 100, 150, 0.1);
-    }
+/* Rainbow Text Animation */
+@keyframes rgbText {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 400% 50%; }
+}
 
-    /* Direction variants */
-    .move-right {
-      animation: scrollRight 5s linear infinite;
-    }
-    .move-left {
-      animation: scrollLeft 5s linear infinite;
-    }
+.rgb-text {
+    background: linear-gradient(90deg, 
+        #ff4d6d, #ff8a4d, #ffd93d, #6bcb77, #4d96ff, #9b59ff, #ff4d6d
+    );
+    background-size: 400% 100%;
+    animation: rgbText var(--rgb-speed) linear infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
 
-    @keyframes scrollRight {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 250% 50%; }
-    }
-    @keyframes scrollLeft {
-      0% { background-position: 0% 50%; }
-      100% { background-position: -250% 50%; }
-    }
+/* Titles */
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 2px;
+}
 
-    /* Inner box (black) */
-    .inner-box {
-      background: #0b0b0e;
-      border-radius: 18px;
-      width: 100%;
-      padding: 14px 18px;
-      border: none;
-      outline: none;
-      font-family: 'Inter', sans-serif;
-      font-size: 1rem;
-      font-weight: 500;
-      color: #f1f1f5;
-      text-align: center;
-      transition: 0.15s;
-      letter-spacing: 0.3px;
-    }
+h1:last-of-type {
+    font-size: 1.6rem;
+    margin-bottom: 4px;
+}
 
-    .inner-box::placeholder {
-      color: #55585e;
-      font-weight: 400;
-      letter-spacing: 0.2px;
-    }
+/* Status */
+.status {
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin: 6px 0 16px 0;
+    font-weight: 500;
+}
 
-    /* Button inner */
-    .btn-inner {
-      background: #0b0b0e;
-      border-radius: 18px;
-      width: 100%;
-      padding: 14px 18px;
-      border: none;
-      font-family: 'Inter', sans-serif;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #ffffff;
-      cursor: pointer;
-      transition: 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      letter-spacing: 0.3px;
-    }
+/* ===== INPUT & BUTTON ===== */
+/* EXACT SAME STRUCTURE AS ORIGINAL */
+.input-wrap {
+    background: transparent;
+    border-radius: 16px;
+    padding: 0;
+    margin-bottom: 14px;
+}
 
-    .btn-inner i {
-      font-size: 1.1rem;
-      color: #b47bff;
-    }
+input {
+    width: 100%;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    outline: none;
+    padding: 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    color: #fff;
+    text-align: center;
+    font-size: 1.05rem;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s;
+    backdrop-filter: blur(10px);
+}
 
-    .rgb-container button {
-      background: transparent;
-      border: none;
-      width: 100%;
-      padding: 0;
-      cursor: pointer;
-    }
+input:focus {
+    border-color: rgba(255, 100, 200, 0.4);
+    box-shadow: 0 0 30px rgba(155, 89, 255, 0.08);
+    background: rgba(255, 255, 255, 0.05);
+}
 
-    .rgb-container button:hover .btn-inner {
-      background: #14141a;
-    }
-    .rgb-container button:active .btn-inner {
-      transform: scale(0.98);
-    }
+input::placeholder {
+    color: #555;
+}
 
-    /* ----- RESULT BOX (RGB BORDER) ----- */
-    .result-box {
-      width: 100%;
-      max-width: 340px;
-      margin: 1.2rem auto 0.5rem;
-      padding: 2.5px;
-      border-radius: 20px;
-      background: linear-gradient(90deg, #ff4d6d, #ffb347, #f9d342, #5fdc7a, #4db8ff, #b47bff, #ff6fcf, #ff4d6d);
-      background-size: 300% 100%;
-      animation: scrollRight 6s linear infinite;
-      display: none; /* hidden by default, shown via JS */
-    }
+button {
+    width: 100%;
+    border: none;
+    border-radius: 16px;
+    padding: 16px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: linear-gradient(135deg, rgba(255, 77, 109, 0.15), rgba(155, 89, 255, 0.15));
+    color: #fff;
+    transition: all 0.3s;
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    letter-spacing: 0.5px;
+    backdrop-filter: blur(10px);
+}
 
-    .result-inner {
-      background: #0b0b0e;
-      border-radius: 18px;
-      padding: 16px 10px;
-      min-height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #f1f1f5;
-      font-size: 1.2rem;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      word-break: break-word;
-    }
+button:hover {
+    background: linear-gradient(135deg, rgba(255, 77, 109, 0.25), rgba(155, 89, 255, 0.25));
+    border-color: rgba(255, 100, 200, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(155, 89, 255, 0.15);
+}
 
-    #codeBox {
-      cursor: default;
-      transition: 0.2s;
-      font-feature-settings: "tnum";
-    }
+button:active {
+    transform: translateY(0px);
+}
 
-    /* ----- FOOTER & META ----- */
-    .footer-meta {
-      margin-top: 1.8rem;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem 1.2rem;
-      font-size: 0.7rem;
-      font-weight: 400;
-      color: #5a5e67;
-      letter-spacing: 0.3px;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
-      padding-top: 1.4rem;
-    }
-    .footer-meta span {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .footer-meta i {
-      color: #7b7f8a;
-      font-size: 0.7rem;
-    }
+/* ===== RESULT BOX ===== */
+#result {
+    margin-top: 20px;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
 
-    .badge {
-      background: rgba(255, 255, 255, 0.03);
-      padding: 0.25rem 1rem;
-      border-radius: 40px;
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      font-size: 0.65rem;
-      font-weight: 500;
-      color: #9ea2ae;
-    }
+.code-display {
+    padding: 14px 24px;
+    border-radius: 16px;
+    border: 2px dashed rgba(255, 255, 255, 0.08);
+    letter-spacing: 6px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.02);
+    font-size: 1.2rem;
+    font-weight: 600;
+    transition: all 0.3s;
+    width: 100%;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
 
-    /* ----- RESPONSIVE FINE-TUNE ----- */
-    @media (max-width: 480px) {
-      .card { padding: 1.8rem 1.2rem; }
-      .main-title { font-size: 1.8rem; }
-      .sub-title { font-size: 1.3rem; }
-      .inner-box { font-size: 0.95rem; padding: 12px 14px; }
-      .btn-inner { font-size: 0.95rem; padding: 12px 14px; }
-    }
+.code-display:hover {
+    border-color: rgba(155, 89, 255, 0.3);
+    background: rgba(255, 255, 255, 0.04);
+}
 
-    /* loading spinner inside result */
-    .loader-dots::after {
-      content: '...';
-      animation: dots 1.2s steps(3, end) infinite;
-      display: inline-block;
-      width: 1.2rem;
-      text-align: left;
-    }
-    @keyframes dots {
-      0% { content: ''; }
-      33% { content: '.'; }
-      66% { content: '..'; }
-      100% { content: '...'; }
-    }
+/* Loader */
+.loader {
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(255, 255, 255, 0.05);
+    border-top: 3px solid #9b59ff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
 
-    /* extra glow for result */
-    .result-box.glow {
-      box-shadow: 0 0 25px rgba(180, 123, 255, 0.15);
-    }
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
 
-    /* small icon inside input */
-    .input-icon {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .input-icon i {
-      position: absolute;
-      left: 18px;
-      color: #4d515a;
-      font-size: 1rem;
-      pointer-events: none;
-    }
-    .input-icon .inner-box {
-      padding-left: 2.8rem;
-    }
-  </style>
+/* Footer */
+footer {
+    margin-top: 22px;
+    font-size: 0.7rem;
+    color: #444;
+    letter-spacing: 0.5px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    padding-top: 18px;
+}
+
+/* ===== RGB BORDER (FOR INPUT & BUTTON) ===== */
+@keyframes rgbMove {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
+
+/* Input Box with RGB Border */
+.rgb-box {
+    padding: 3px;
+    border-radius: 18px;
+    background: linear-gradient(90deg, #ff4d6d, #ff8a4d, #ffd93d, #6bcb77, #4d96ff, #9b59ff, #ff4d6d);
+    background-size: 300% 100%;
+    animation: rgbMove 4s linear infinite;
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto 16px auto;
+    transition: all 0.3s;
+    box-shadow: 0 0 30px rgba(155, 89, 255, 0.05);
+}
+
+.rgb-box input {
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 16px;
+    border-radius: 16px;
+    background: #0a0a0f;
+    color: #fff;
+    text-align: center;
+    font-size: 1.05rem;
+    font-family: 'Poppins', sans-serif;
+}
+
+.rgb-box input::placeholder {
+    color: #555;
+}
+
+/* Button with RGB Border */
+.rgb-btn {
+    width: 100%;
+    max-width: 340px;
+    padding: 3px;
+    border-radius: 18px;
+    background: linear-gradient(90deg, #ff4d6d, #ff8a4d, #ffd93d, #6bcb77, #4d96ff, #9b59ff, #ff4d6d);
+    background-size: 300% 100%;
+    animation: rgbMove 4s linear infinite;
+    border: none;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto;
+    transition: all 0.3s;
+}
+
+.btn-inner {
+    background: #0a0a0f;
+    color: #fff;
+    display: block;
+    padding: 14px;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+}
+
+.rgb-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 40px rgba(155, 89, 255, 0.2);
+}
+
+.rgb-btn:hover .btn-inner {
+    background: #111118;
+}
+
+/* Result Box with RGB Border */
+.result-box {
+    width: 100%;
+    max-width: 340px;
+    margin: 16px auto 0;
+    padding: 3px;
+    border-radius: 18px;
+    background: linear-gradient(90deg, #ff4d6d, #ff8a4d, #ffd93d, #6bcb77, #4d96ff, #9b59ff, #ff4d6d);
+    background-size: 300% 100%;
+    animation: rgbMove 5s linear infinite;
+    display: none;
+    box-shadow: 0 0 40px rgba(155, 89, 255, 0.05);
+}
+
+.result-inner {
+    background: #0a0a0f;
+    border-radius: 16px;
+    padding: 16px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+#codeBox {
+    letter-spacing: 4px;
+    color: #fff;
+    cursor: default;
+}
+
+/* Small decorative elements */
+.divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 4px 0 10px 0;
+    opacity: 0.3;
+}
+
+.divider span {
+    width: 30px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+}
+
+.badge-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.badge {
+    padding: 4px 14px;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.6rem;
+    letter-spacing: 0.5px;
+    color: #888;
+    font-weight: 500;
+}
+
+@media (max-width: 480px) {
+    .card { padding: 24px 16px; }
+    h1 { font-size: 1.7rem; }
+    h1:last-of-type { font-size: 1.4rem; }
+}
+</style>
 </head>
 <body>
-  <div class="card">
 
-    <!-- TITLE -->
-    <div class="main-title">
-      <i class="fas fa-crown"></i>
-      <span class="rgb-text">Arslan MD</span>
-    </div>
-    <div class="sub-title rgb-text">PAIR CODE</div>
+<div class="card">
 
-    <!-- STATUS -->
-    <div class="status-label rgb-text">
-      <i class="fas fa-phone-alt" style="margin-right: 6px; -webkit-text-fill-color: initial; color: #b47bff;"></i>
-      ENTER WHATSAPP NUMBER
-    </div>
+<h1 class="rgb-text">👑 Arslan MD 👑</h1>
+<h1 class="rgb-text">PAIR CODE</h1>
 
-    <!-- INPUT BOX (move-right) -->
-    <div class="rgb-container move-right">
-      <div class="input-icon">
-        <i class="fas fa-plus-circle"></i>
-        <input type="text" id="number" class="inner-box" placeholder="923237045919" value="923237045919" />
-      </div>
-    </div>
+<p class="status rgb-text">TYPE YOUR WHATSAPP NUMBER</p>
 
-    <!-- BUTTON (move-left) -->
-    <div class="rgb-container move-left" style="margin-top: 0.2rem;">
-      <button onclick="getCode()">
-        <div class="btn-inner">
-          <i class="fas fa-link"></i> GET PAIR CODE
-        </div>
-      </button>
-    </div>
+<!-- Input with RGB Border -->
+<div class="rgb-box">
+    <input type="text" id="number" placeholder="923237045919">
+</div>
 
-    <!-- RESULT BOX (move-right) -->
-    <div class="result-box move-right" id="borderBox">
-      <div class="result-inner" id="codeBox">----</div>
-    </div>
+<!-- Button with RGB Border -->
+<button class="rgb-btn" onclick="getCode()">
+    <span class="btn-inner">GET PAIR CODE</span>
+</button>
 
-    <!-- extra status -->
-    <div style="margin-top: 1.2rem;">
-      <span class="badge"><i class="fas fa-robot" style="margin-right: 5px;"></i> WHATSAPP BOT</span>
-      <span class="badge" style="margin-left: 4px;"><i class="fas fa-code"></i> ARSLAN-MD</span>
-    </div>
-    <div style="margin-top: 0.5rem; font-size: 0.7rem; color: #4d515a; letter-spacing: 0.2px;">
-      <i class="fas fa-bolt" style="color: #fbbf24; margin-right: 4px;"></i> MINI BOT EDITION · 2026
-    </div>
+<!-- Result Box with RGB Border -->
+<div class="result-box" id="borderBox">
+    <div class="result-inner" id="codeBox">----</div>
+</div>
 
-    <!-- FOOTER -->
-    <div class="footer-meta">
-      <span><i class="fas fa-shield-alt"></i> secure</span>
-      <span><i class="fas fa-bolt"></i> instant</span>
-      <span><i class="fas fa-sync-alt"></i> v2.0</span>
-      <span><i class="fas fa-crown" style="color: #fbbf24;"></i> Arslan</span>
-    </div>
-  </div>
+<!-- Footer Badges -->
+<div class="badge-group">
+    <span class="badge">🤖 WHATSAPP BOT</span>
+    <span class="badge">⚡ ARSLAN-MD</span>
+    <span class="badge">✨ 2026</span>
+</div>
 
-  <script>
-    // ----- CORE LOGIC (unchanged structure, only enhanced UX) -----
-    async function getCode() {
-      const numInput = document.getElementById("number");
-      const codeBox = document.getElementById("codeBox");
-      const borderBox = document.getElementById("borderBox");
+<p class="status rgb-text" style="margin-top: 10px; font-size: 0.6rem;">MADE BY ARSLAN-MD · MINI BOT EDITION</p>
 
-      // clean number: only digits
-      const num = numInput.value.replace(/[^0-9]/g, '');
+</div>
 
-      // if empty
-      if (!num) {
+<script>
+// ===== EXACT ORIGINAL FUNCTIONALITY - NO CHANGES =====
+async function getCode() {
+    const num = document.getElementById("number").value.replace(/[^0-9]/g, '');
+    const codeBox = document.getElementById("codeBox");
+    const borderBox = document.getElementById("borderBox");
+
+    // Agar number khali hai
+    if (!num) {
         borderBox.style.display = "block";
         codeBox.style.letterSpacing = "normal";
-        codeBox.style.color = "#ff6f8a";
-        codeBox.style.fontWeight = "500";
-        codeBox.innerText = "⏳ Enter your WhatsApp number";
+        codeBox.style.color = "#ff4d6d";
+        codeBox.innerText = "APNA WHATSAPP NUMBER LIKHE";
         return;
-      }
-
-      // loading state
-      borderBox.style.display = "block";
-      codeBox.style.letterSpacing = "normal";
-      codeBox.style.color = "#bdbfff";
-      codeBox.style.fontWeight = "500";
-      codeBox.innerHTML = '<span class="loader-dots">Connecting</span>';
-
-      try {
-        const res = await fetch(`/code?number=${num}`);
-        const data = await res.json();
-
-        if (data.code) {
-          codeBox.style.letterSpacing = "4px";
-          codeBox.style.color = "#ffffff";
-          codeBox.style.fontWeight = "600";
-          codeBox.innerText = data.code;
-          // optional: copy hint
-        } else {
-          codeBox.style.letterSpacing = "normal";
-          codeBox.style.color = "#ff8a9b";
-          codeBox.style.fontWeight = "500";
-          codeBox.innerText = "⚠️ Server busy, try again";
-        }
-      } catch (error) {
-        codeBox.style.letterSpacing = "normal";
-        codeBox.style.color = "#ff8a9b";
-        codeBox.style.fontWeight = "500";
-        codeBox.innerText = "⛔ Server unreachable";
-      }
     }
 
-    // optional: if user hits Enter in input
-    document.getElementById("number").addEventListener("keydown", function(e) {
-      if (e.key === "Enter") {
+    // Loading State
+    borderBox.style.display = "block";
+    codeBox.style.letterSpacing = "normal";
+    codeBox.style.color = "#9b59ff";
+    codeBox.innerText = "CONNECTING.....";
+
+    try {
+        const res = await fetch(`/code?number=${num}`);
+        const data = await res.json();
+        
+        if (data.code) {
+            codeBox.style.letterSpacing = "4px";
+            codeBox.style.color = "#fff";
+            codeBox.innerText = data.code;
+        } else {
+            codeBox.style.color = "#ff4d6d";
+            codeBox.innerText = "SERVER FULL";
+        }
+    } catch (e) {
+        codeBox.style.color = "#ff4d6d";
+        codeBox.innerText = "SERVER IS FULL";
+    }
+}
+
+// Enter key support
+document.getElementById("number").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
         e.preventDefault();
         getCode();
-      }
-    });
+    }
+});
+</script>
 
-    // auto-focus
-    window.addEventListener('load', function() {
-      const input = document.getElementById('number');
-      input.focus();
-      input.setSelectionRange(input.value.length, input.value.length);
-    });
-
-    // for demo: if the number field has default value, we can show a quick hint
-    // but we keep it clean.
-  </script>
 </body>
 </html>
