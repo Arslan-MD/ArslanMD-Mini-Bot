@@ -77,16 +77,14 @@ renderLargerThumbnail: true
 await conn.sendMessage(from, { react: { text: "✅", key: m.key } });
 
 } catch (err) {
+    console.error(err);
 
-console.error("PLAY ERROR:", err);
-
-reply("❌ Error Found Please Try Later");
-
-await conn.sendMessage(from, { react: { text: "❌", key: m.key } });
-
+    return reply(
+        "```" +
+        (err.stack || err.message || String(err)) +
+        "```"
+    );
 }
-
-});
 
 
 cmd({
