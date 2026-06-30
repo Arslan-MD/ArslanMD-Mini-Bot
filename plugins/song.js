@@ -44,7 +44,7 @@ caption
 },{quoted:fakevCard})
 
 /* 🎵 AUDIO API - Same as video but ytmp3 */
-const api = `https://arslan-apis-v2.vercel.app/download/ytmp3?url=${encodeURIComponent(vid.url)}`
+const api = `https://arslan-apis-v2.vercel.app/download/ytmp4?url=${encodeURIComponent(vid.url)}`
 
 const res = await axios.get(api,{timeout:60000})
 
@@ -65,7 +65,7 @@ const title = res.data.result.metadata.title || vid.title
 await conn.sendMessage(from,{
 audio:{url:audioUrl},
 mimetype:"audio/mpeg",
-caption:`🎵 *${title}*\n\n> © ᴀʀꜱʟᴀɴ-ᴍᴅ`
+caption:`🎵 © ᴀʀꜱʟᴀɴ-ᴍᴅ`
 },{quoted:fakevCard})
 
 }catch(err){
