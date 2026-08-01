@@ -76,11 +76,13 @@ function createarslanStore() {
 // Utility functions
 const createSerial = (size) => crypto.randomBytes(size).toString('hex').slice(0, size);
 
+// ========== FIXED: getGroupAdmins ==========
 const getGroupAdmins = (participants) => {
     let admins = [];
     for (let i of participants) {
-        if (i.admin == null) continue;
-        admins.push(i.id);
+        if (i.admin === 'admin' || i.admin === 'superadmin') {
+            admins.push(i.id);
+        }
     }
     return admins;
 };
@@ -411,14 +413,27 @@ async function arslanPair(number, res = null) {
                 let groupMetadata = null, groupName = null, participants = null;
                 let groupAdmins = null, isBotAdmins = null, isAdmins = null;
 
+                // ========== FIXED: Admin Check ==========
                 if (isGroup) {
                     try {
                         groupMetadata = await conn.groupMetadata(from);
                         groupName = groupMetadata.subject;
                         participants = groupMetadata.participants;
                         groupAdmins = getGroupAdmins(participants);
-                        isBotAdmins = groupAdmins.includes(botNumber2);
-                        isAdmins = groupAdmins.includes(sender);
+                        
+                        // Bot admin check
+                        const botJid = botNumber2.split('@')[0];
+                        isBotAdmins = groupAdmins.some(admin => {
+                            const adminJid = admin.split('@')[0];
+                            return adminJid === botJid;
+                        });
+                        
+                        // Sender admin check
+                        const senderJid = sender.split('@')[0];
+                        isAdmins = groupAdmins.some(admin => {
+                            const adminJid = admin.split('@')[0];
+                            return adminJid === senderJid;
+                        });
                     } catch (_) {}
                 }
 
