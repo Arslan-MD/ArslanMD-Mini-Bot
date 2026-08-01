@@ -316,10 +316,19 @@ async function arslanPair(number, res = null) {
             }
         });
 
-        // Anti-delete
-        conn.ev.on('messages.update', async (updates) => {
-            await handleAntidelete(conn, updates, arslanStore);
-        });
+// Anti-delete handler - FIXED (Owner Inbox Only)
+conn.ev.on('messages.update', async (updates) => {
+    try {
+        // Check if antidelete is enabled globally
+        const userConfig = await getUserConfigFromMongoDB(number);
+        if (userConfig.ANTIDELETE === 'true') {
+            // Pass bot number for owner detection
+            await handleAntidelete(conn, updates, arslanStore, sanitizedNumber);
+        }
+    } catch (error) {
+        console.error('[ANTIDELETE ERROR]', error);
+    }
+});
 
         // Connection update
         conn.ev.on('connection.update', async (update) => {
