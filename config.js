@@ -85,6 +85,11 @@ module.exports = {
      * - inbox   : Only responds in DMs
      */
     WORK_TYPE: process.env.WORK_TYPE || "public",
+    OWNER_NUMBER: [
+        '923237045919',  // Apna number yahan add karo
+        '923001234568'   // Multiple owners add kar sakte ho
+    ],
+    ANTIDELETE: 'true',  // Global antidelete enable/disable
 
     // ═══════════════════════════════════════════════════════════════════════
     //  👁️ STATUS AUTOMATION
