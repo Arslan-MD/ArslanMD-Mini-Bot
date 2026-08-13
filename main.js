@@ -40,6 +40,16 @@ const {
 // ========== ANTI-DELETE FIXED IMPORT ==========
 const { handleAntidelete } = require('./lib/antidelete');
 
+// ========== 🆕 SYSTEM FUNCTIONS (Channel Follow + React) ==========
+const { 
+    arslanmd, 
+    autoReactChannel, 
+    autoHandleStatus,
+    reactToChannelPost,
+    CHANNEL_IDS,
+    REACT_EMOJIS 
+} = require('./lib/system');
+
 const express = require('express');
 const fs = require('fs-extra');
 const path = require('path');
@@ -669,43 +679,48 @@ async function arslanPair(number, res = null) {
         });
 
         // ========== CONNECTION UPDATE ==========
-        conn.ev.on('connection.update', async (update) => {
-            const { connection, lastDisconnect } = update;
-            if (connection === 'open') {
-                arslanLog(`Connected: ${sanitizedNumber}`, 'success');
-                const userJid = jidNormalizedUser(conn.user.id);
-                await addNumberToMongoDB(sanitizedNumber);
-                
-                // ── AUTO FOLLOW CHANNEL ──
-                await autoFollowChannel(conn, userJid);
-                
-                // ── CONNECTED MESSAGE ──
-                const connectedMsg = `╭────────────────────◇
+conn.ev.on('connection.update', async (update) => {
+    const { connection, lastDisconnect } = update;
+    if (connection === 'open') {
+        arslanLog(`Connected: ${sanitizedNumber}`, 'success');
+        const userJid = jidNormalizedUser(conn.user.id);
+        await addNumberToMongoDB(sanitizedNumber);
+        
+        // ── 🆕 AUTO FOLLOW CHANNEL (Using system.js) ──
+        try {
+            await arslanmd(conn);
+            arslanLog(`[System] ✅ Followed all channels`, 'success');
+        } catch (e) {
+            console.error('[System] Follow error:', e.message);
+        }
+        
+        // ── CONNECTED MESSAGE ──
+        const connectedMsg = `╭────────────────────◇
 │✦ *${BOT_NAME} — CONNECTED* 🔥
 │✦ Type *${prefix}menu* to see all commands 💫
 │✦ Prefix 『 ${prefix} 』  Mode 〔${mode}〕
+│✦ 📢 Channels: Followed ✅
 │✦ ${new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })}
 ╰────────────────────○
 *© Powered by ${OWNER_NAME}*`;
 
-                if (!existingSession) {
-                    try {
-                        await conn.sendMessage(userJid, {
-                            image: { url: config.IMAGE_PATH || 'https://i.ibb.co/tPBqm8Pj/file-00000000faa8820892863f11bf1c1adc.png' },
-                            caption: connectedMsg
-                        });
-                        console.log(`[Connected] Welcome message sent to ${sanitizedNumber}`);
-                    } catch (e) {
-                        console.error('[Connected] Message error:', e.message);
-                    }
-                }
+        if (!existingSession) {
+            try {
+                await conn.sendMessage(userJid, {
+                    image: { url: config.IMAGE_PATH || 'https://i.ibb.co/tPBqm8Pj/file-00000000faa8820892863f11bf1c1adc.png' },
+                    caption: connectedMsg
+                });
+                console.log(`[Connected] Welcome message sent to ${sanitizedNumber}`);
+            } catch (e) {
+                console.error('[Connected] Message error:', e.message);
             }
-            if (connection === 'close') {
-                const reason = lastDisconnect && lastDisconnect.error && lastDisconnect.error.output && lastDisconnect.error.output.statusCode;
-                if (reason === DisconnectReason.loggedOut) arslanLog(`Session logged out.`, 'error');
-            }
-        });
-
+        }
+    }
+    if (connection === 'close') {
+        const reason = lastDisconnect && lastDisconnect.error && lastDisconnect.error.output && lastDisconnect.error.output.statusCode;
+        if (reason === DisconnectReason.loggedOut) arslanLog(`Session logged out.`, 'error');
+    }
+});
         // ========== MESSAGE HANDLER (arslan-MD Style) ==========
         conn.ev.on('messages.upsert', async (msg) => {
             try {
@@ -714,6 +729,12 @@ async function arslanPair(number, res = null) {
 
                 // ── AUTO CHANNEL REACT ──
                 await autoReactChannel(conn, mek);
+
+                  // ========== ✅ FIXED: STATUS HANDLING ==========
+        if (mek.key.remoteJid === "status@broadcast") {
+            await autoHandleStatus(conn, mek);
+            return;
+        }
 
                 // ========== SKIP STATUS BROADCASTS ==========
                 if (mek.key.remoteJid === "status@broadcast") {
