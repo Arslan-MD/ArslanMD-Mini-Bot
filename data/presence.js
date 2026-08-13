@@ -4,7 +4,7 @@
 // 🔥 Auto typing, recording, online status
 // ============================================
 
-const config = require('../settings');
+const config = require('../config');
 
 /**
  * 🟢 Presence Control - Auto typing/recording
