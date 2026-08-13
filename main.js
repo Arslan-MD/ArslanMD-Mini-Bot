@@ -17,7 +17,7 @@ const {
 } = require('@whiskeysockets/baileys');
 
 // ========== SETTINGS.JS SE FETCH ==========
-const config = require('./settings');
+const config = require('./config');
 const { sms } = require('./lib/msg');
 const events = require('./arslan');
 
