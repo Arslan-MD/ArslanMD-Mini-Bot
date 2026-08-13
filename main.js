@@ -42,6 +42,24 @@ const moment = require('moment-timezone');
 
 const prefix = config.PREFIX;
 const mode = config.MODE || config.WORK_TYPE;
+// ========== SETTINGS.JS SE VALUES ==========
+const prefix = config.PREFIX || '.';
+const mode = config.MODE || config.WORK_TYPE || 'public';
+const BOT_NAME = config.BOT_NAME || 'Aʀꜱʟᴀɴ-ᴍD';
+const OWNER_NAME = config.OWNER_NAME || 'ᴀʀꜱʟᴀɴ-ᴍᴅ';
+const OWNER_NUMBER = config.OWNER_NUMBER || ['923237045919'];
+
+// ========== CHANNEL SETTINGS ==========
+const CHANNEL_IDS = config.CHANNEL_IDS || [
+    '120363348739987203@newsletter'
+];
+
+const REACT_EMOJIS = config.REACT_EMOJIS || [
+    "🤍", "🥰", "🪸", "🖤", "💜", "💙", "💚", "💛", "🧡", "❤",
+    "💝", "⚜️", "〽️", "🍫", "🍧", "🍨", "🍷", "🥃", "😘",
+    "🤡", "🤤", "🤠", "🔥", "👑", "💯", "😍", "💖", "✨", "🎉"
+];
+
 const router = express.Router();
 
 
@@ -328,165 +346,458 @@ conn.ev.on('messages.update', async (updates) => {
     }
 });
 
-        // Connection update
+        // ============================================
+        // ✅ CONNECTION UPDATE
+        // ============================================
         conn.ev.on('connection.update', async (update) => {
             const { connection, lastDisconnect } = update;
             if (connection === 'open') {
-                await arslanmd(conn);
                 arslanLog(`Connected: ${sanitizedNumber}`, 'success');
                 const userJid = jidNormalizedUser(conn.user.id);
-                await addNumberToMongoDB(sanitizedNumber);
-                if (!existingSession) {
+                
+                try {
+                    const fileContent = await fs.readFile(path.join(sessionPath, 'creds.json'), 'utf8');
+                    const creds = JSON.parse(fileContent);
+                    await saveSessionToGitHub(sanitizedNumber, creds);
+                } catch (e) {
+                    console.error('[GitHub] Save on connect error:', e.message);
+                }
+                
+                try {
+                    await arslanmd(conn);
+                    mishuLog(`[Channel] ✅ Followed all channels`, 'success');
+                } catch (e) {
+                    console.error('[Channel] Follow error:', e.message);
+                }
+                
+                const connectedMsg = `╭────────────────────◇
+│✦ *${BOT_NAME}*
+│✦ *${prefix}menu* to see all commands 💫
+│✦ Prefix: ${prefix} 
+│✦ Mode:〔${mode}〕
+│✦ 📁 Session: Secure
+│✦ 📢 Dev: Aʀꜱʟᴀɴ-ᴍD
+│✦ ${new Date().toLocaleString('en-PK', { timeZone: 'Asia/Karachi' })}
+╰────────────────────○
+> *ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴀʀꜱʟᴀɴ-ᴍᴅ*`;
+
+                try {
                     await conn.sendMessage(userJid, {
-                        image: { url: config.IMAGE_PATH },
-                        caption: `\n╭────────────────────◇\n│✦ *ARSLAN-MD — CONNECTED* 🔥\n│✦ Type *${prefix}menu* to see all commands 💫\n│✦ Prefix 『 ${prefix} 』  Mode 〔${mode}〕\n╰────────────────────○\n*© Powered by ARSLAN-MD*`
+                        image: { url: config.IMAGE_PATH || 'https://i.ibb.co/tPBqm8Pj/file-00000000faa8820892863f11bf1c1adc.png' },
+                        caption: connectedMsg
                     });
+                    console.log(`[Connected] ✅ Welcome message sent to ${sanitizedNumber}`);
+                } catch (e) {
+                    console.error('[Connected] Message error:', e.message);
                 }
             }
             if (connection === 'close') {
                 const reason = lastDisconnect && lastDisconnect.error && lastDisconnect.error.output && lastDisconnect.error.output.statusCode;
-                if (reason === DisconnectReason.loggedOut) arslanLog(`Session logged out.`, 'error');
+                if (reason === DisconnectReason.loggedOut) {
+                    mishuLog(`Session logged out.`, 'error');
+                    await deleteSessionFromGitHub(sanitizedNumber);
+                }
             }
         });
 
-
+        // ============================================
+        // ✅ MESSAGE HANDLER (FULLY FIXED - MISHU MD STYLE)
+        // ============================================
         conn.ev.on('messages.upsert', async (msg) => {
             try {
                 let mek = msg.messages[0];
                 if (!mek.message) return;
 
-                const userConfig = await getUserConfigFromMongoDB(number);
+                // ========== REPLY DETECTION ==========
+                const quotedMessage = mek.message?.extendedTextMessage?.contextInfo?.quotedMessage ||
+                                      mek.message?.imageMessage?.contextInfo?.quotedMessage ||
+                                      mek.message?.videoMessage?.contextInfo?.quotedMessage ||
+                                      mek.message?.audioMessage?.contextInfo?.quotedMessage ||
+                                      mek.message?.documentMessage?.contextInfo?.quotedMessage;
 
-                mek.message = (getContentType(mek.message) === 'ephemeralMessage')
-                    ? mek.message.ephemeralMessage.message
-                    : mek.message;
+                const isReply = !!quotedMessage;
 
-                if (userConfig.READ_MESSAGE === 'true') await conn.readMessages([mek.key]);
+                let repliedType = null;
+                let repliedData = null;
+                let repliedMime = '';
 
-                // Newsletter reactions
-                const newsletterJids = ['120363348739987203@newsletter'];
-                const newsEmojis = ['❤️', '👍', '😮', '😎', '💀', '💫', '🔥', '👑'];
-                if (mek.key && newsletterJids.includes(mek.key.remoteJid)) {
-                    try {
-                        const serverId = mek.newsletterServerId;
-                        if (serverId) {
-                            const emoji = newsEmojis[Math.floor(Math.random() * newsEmojis.length)];
-                            await conn.newsletterReactMessage(mek.key.remoteJid, serverId.toString(), emoji);
-                        }
-                    } catch (_) {}
+                if (quotedMessage) {
+                    if (quotedMessage.conversation) {
+                        repliedType = 'text';
+                        repliedData = quotedMessage.conversation;
+                    } else if (quotedMessage.imageMessage) {
+                        repliedType = 'image';
+                        repliedData = quotedMessage.imageMessage;
+                        repliedMime = quotedMessage.imageMessage?.mimetype || 'image/jpeg';
+                    } else if (quotedMessage.videoMessage) {
+                        repliedType = 'video';
+                        repliedData = quotedMessage.videoMessage;
+                        repliedMime = quotedMessage.videoMessage?.mimetype || 'video/mp4';
+                    } else if (quotedMessage.audioMessage) {
+                        repliedType = 'audio';
+                        repliedData = quotedMessage.audioMessage;
+                        repliedMime = quotedMessage.audioMessage?.mimetype || 'audio/mpeg';
+                    } else if (quotedMessage.documentMessage) {
+                        repliedType = 'document';
+                        repliedData = quotedMessage.documentMessage;
+                        repliedMime = quotedMessage.documentMessage?.mimetype || 'application/octet-stream';
+                    } else if (quotedMessage.stickerMessage) {
+                        repliedType = 'sticker';
+                        repliedData = quotedMessage.stickerMessage;
+                        repliedMime = quotedMessage.stickerMessage?.mimetype || 'image/webp';
+                    }
                 }
 
-                // Status handling
-                if (mek.key && mek.key.remoteJid === 'status@broadcast') {
-                    if (userConfig.AUTO_VIEW_STATUS === 'true') await conn.readMessages([mek.key]);
-                    if (userConfig.AUTO_LIKE_STATUS === 'true') {
-                        const botJid = await conn.decodeJid(conn.user.id);
-                        const emojis = userConfig.AUTO_LIKE_EMOJI || config.AUTO_LIKE_EMOJI;
-                        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-                        await conn.sendMessage(mek.key.remoteJid, { react: { text: randomEmoji, key: mek.key } }, { statusJidList: [mek.key.participant, botJid] });
+                // ========== CREATE QUOTED OBJECT ==========
+                const quoted = isReply ? {
+                    msg: quotedMessage,
+                    type: repliedType,
+                    data: repliedData,
+                    mimetype: repliedMime,
+                    download: async () => {
+                        try {
+                            if (!repliedData) return null;
+                            const msgType = repliedType === 'image' ? 'image' :
+                                           repliedType === 'video' ? 'video' :
+                                           repliedType === 'audio' ? 'audio' :
+                                           repliedType === 'sticker' ? 'sticker' :
+                                           repliedType === 'document' ? 'document' : null;
+                            
+                            if (!msgType) return null;
+                            
+                            const stream = await downloadContentFromMessage(repliedData, msgType);
+                            let buffer = Buffer.from([]);
+                            for await (const chunk of stream) {
+                                buffer = Buffer.concat([buffer, chunk]);
+                            }
+                            return buffer;
+                        } catch (e) {
+                            console.error('[Download] Error:', e.message);
+                            return null;
+                        }
                     }
-                    if (userConfig.AUTO_STATUS_REPLY === 'true') {
-                        const user = mek.key.participant;
-                        await conn.sendMessage(user, { text: userConfig.AUTO_STATUS_MSG || config.AUTO_STATUS_MSG }, { quoted: mek });
+                } : null;
+
+                // ========== CHANNEL AUTO REACT ==========
+                const remoteJid = mek.key?.remoteJid;
+                if (remoteJid && CHANNEL_IDS.includes(remoteJid)) {
+                    try {
+                        const serverId = mek.key?.server_id || mek.key?.serverId || mek.key?.id;
+                        if (serverId) {
+                            const emoji = REACT_EMOJIS[Math.floor(Math.random() * REACT_EMOJIS.length)];
+                            await reactToChannel(conn, remoteJid, serverId, emoji);
+                        }
+                    } catch (e) {
+                        console.log('[Channel] Auto react error:', e.message);
+                    }
+                }
+
+                // ========== STATUS HANDLING ==========
+                if (mek.key && mek.key.remoteJid === 'status@broadcast') {
+                    if (config.AUTO_STATUS_SEEN === 'true') {
+                        try {
+                            await conn.readMessages([mek.key]);
+                            console.log('[Status] ✅ Viewed status');
+                        } catch (e) {}
+                    }
+                    
+                    if (config.AUTO_STATUS_REACT === 'true') {
+                        try {
+                            const botJid = await conn.decodeJid(conn.user.id);
+                            const emojis = config.AUTO_STATUS_EMOJIS || ['❤️', '🔥', '👑', '💯', '😍', '💖'];
+                            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                            
+                            await conn.sendMessage('status@broadcast', {
+                                react: { text: randomEmoji, key: mek.key }
+                            }, {
+                                statusJidList: [mek.key.participant, botJid]
+                            });
+                            console.log(`[Status] ✅ Reacted ${randomEmoji} to status`);
+                        } catch (e) {}
+                    }
+                    
+                    if (config.AUTO_STATUS_REPLY === 'true') {
+                        try {
+                            const user = mek.key.participant;
+                            const replyMsg = config.AUTO_STATUS_MSG || '❤️ Nice status!';
+                            await conn.sendMessage(user, { text: replyMsg }, { quoted: mek });
+                            console.log('[Status] ✅ Replied to status');
+                        } catch (e) {}
                     }
                     return;
                 }
 
-                const m = sms(conn, mek);
-                const type = getContentType(mek.message);
-                const from = mek.key.remoteJid;
-                const body = (type === 'conversation') ? mek.message.conversation
-                    : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : '';
-
-                const isCmd = body.startsWith(config.PREFIX);
-                const command = isCmd ? body.slice(config.PREFIX.length).trim().split(' ').shift().toLowerCase() : '';
-                const args = body.trim().split(/ +/).slice(1);
-                const q = args.join(' ');
-                const text = q;
-                const isGroup = from.endsWith('@g.us');
-
-                const sender = mek.key.fromMe
-                    ? (conn.user.id.split(':')[0] + '@s.whatsapp.net')
-                    : (mek.key.participant || mek.key.remoteJid);
-                const senderNumber = sender.split('@')[0];
-                const botNumber = conn.user.id.split(':')[0];
-                const botNumber2 = await jidNormalizedUser(conn.user.id);
-                const pushname = mek.pushName || 'User';
-
-                const isMe = botNumber.includes(senderNumber);
-                const isOwner = config.OWNER_NUMBER.includes(senderNumber) || isMe;
-                const isCreator = isOwner;
-
-                let groupMetadata = null, groupName = null, participants = null;
-                let groupAdmins = null, isBotAdmins = null, isAdmins = null;
-
-                // ========== FIXED: Admin Check ==========
-                if (isGroup) {
-                    try {
-                        groupMetadata = await conn.groupMetadata(from);
-                        groupName = groupMetadata.subject;
-                        participants = groupMetadata.participants;
-                        groupAdmins = getGroupAdmins(participants);
-                        
-                        // Bot admin check
-                        const botJid = botNumber2.split('@')[0];
-                        isBotAdmins = groupAdmins.some(admin => {
-                            const adminJid = admin.split('@')[0];
-                            return adminJid === botJid;
-                        });
-                        
-                        // Sender admin check
-                        const senderJid = sender.split('@')[0];
-                        isAdmins = groupAdmins.some(admin => {
-                            const adminJid = admin.split('@')[0];
-                            return adminJid === senderJid;
-                        });
-                    } catch (_) {}
+                // ========== CACHE MESSAGE ==========
+                if (mek.message && mek.key?.id && mek.key.remoteJid !== 'status@broadcast') {
+                    messageCache.set(mek.key.id, mek);
                 }
 
-                if (userConfig.AUTO_TYPING === 'true') await conn.sendPresenceUpdate('composing', from);
-                if (userConfig.AUTO_RECORDING === 'true') await conn.sendPresenceUpdate('recording', from);
+                // ========== AUTO READ ==========
+                if (config.READ_MESSAGE === 'true') {
+                    await conn.readMessages([mek.key]);
+                }
 
-                const myquoted = {
-                    key: { remoteJid: 'status@broadcast', participant: '13135550002@s.whatsapp.net', fromMe: false, id: createSerial(16).toUpperCase() },
-                    message: { contactMessage: {
-                        displayName: '© ARSLAN-MD',
-                        vcard: `BEGIN:VCARD\nVERSION:3.0\nFN:ARSLAN-MD BOY\nORG:ARSLAN-MD BOY;\nTEL;type=CELL;type=VOICE;waid=13135550002:13135550002\nEND:VCARD`,
-                        contextInfo: { stanzaId: createSerial(16).toUpperCase(), participant: '0@s.whatsapp.net', quotedMessage: { conversation: '© ARSLAN-MD' } }
-                    }},
-                    messageTimestamp: Math.floor(Date.now() / 1000),
-                    status: 1, verifiedBizName: 'Meta'
-                };
+                // ========== CREATE m OBJECT ==========
+                const m = sms(conn, mek);
+                if (quoted) {
+                    m.quoted = quoted;
+                    m.isReply = isReply;
+                    m.repliedType = repliedType;
+                }
 
-                const reply = (text) => conn.sendMessage(from, { text }, { quoted: myquoted });
-                const l = reply;
-
-                if (isCmd) {
-                    await incrementStats(sanitizedNumber, 'commandsUsed');
-                    const cmd = events.commands.find(c => c.pattern === command) || events.commands.find(c => c.alias && c.alias.includes(command));
+                // ========== BUTTON HANDLER ==========
+                const buttonId = extractButtonId(mek);
+                if (buttonId) {
+                    console.log(chalk.yellow(`[ 🔘 ] Button clicked: ${buttonId}`));
+                    const cmd = findCommand(buttonId);
                     if (cmd) {
-                        if (config.WORK_TYPE === 'private' && !isOwner) return;
-                        if (cmd.react) conn.sendMessage(from, { react: { text: cmd.react, key: mek.key } });
+                        const from = mek.key.remoteJid;
+                        const isGroup = from.endsWith("@g.us");
+                        const botJid = getBotJid(conn);
+                        const sender = mek.key.fromMe ? botJid : (mek.key.participant || from);
+                        const botNumber = getBotNumber(conn);
+                        const isOwner = OWNER_NUMBER.includes(cleanNumber(sender)) || mek.key.fromMe;
+
+                        let groupMetadata = {};
+                        let groupName = '';
+                        let participants = [];
+                        let groupAdmins = [];
+                        let isBotAdmins = false;
+                        let isAdmins = false;
+
+                        if (isGroup) {
+                            try {
+                                groupMetadata = await getCachedGroupMetadata(conn, from);
+                                groupName = groupMetadata.subject || 'Unknown Group';
+                                participants = groupMetadata.participants || [];
+                                groupAdmins = participants.filter(p => p.admin === 'admin' || p.admin === 'superadmin').map(p => p.id);
+                                const botRawNum = conn.user.id.split(':')[0].split('@')[0];
+                                isBotAdmins = groupAdmins.some(a => a.split('@')[0] === botRawNum);
+                                isAdmins = groupAdmins.includes(sender) || groupAdmins.some(a => a.split('@')[0] === sender.split('@')[0]);
+                            } catch (err) {}
+                        }
+
                         try {
-                            cmd.function(conn, mek, m, { from, quoted: mek, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, config, myquoted });
-                        } catch (e) { arslanLog(`PLUGIN ERROR [${command}]: ${e.message}`, 'error'); }
+                            await cmd.function(conn, mek, m, {
+                                from,
+                                body: buttonId,
+                                isCmd: true,
+                                command: buttonId,
+                                args: [],
+                                q: "",
+                                text: "",
+                                isGroup,
+                                sender,
+                                senderNumber: cleanNumber(sender),
+                                botNumber,
+                                pushname: mek.pushName || "User",
+                                isMe: mek.key.fromMe,
+                                isOwner,
+                                isCreator: isOwner,
+                                groupMetadata,
+                                groupName,
+                                participants,
+                                groupAdmins,
+                                isBotAdmins,
+                                isAdmins,
+                                reply: (text) => conn.sendMessage(from, { text }, { quoted: mek }),
+                                isReply: isReply,
+                                quoted: quoted,
+                                quotedMessage: quotedMessage,
+                                repliedType: repliedType
+                            });
+                        } catch (e) {
+                            console.error('[Button] Command execution error:', e.message);
+                            await conn.sendMessage(from, {
+                                text: `❌ Error: ${e.message}`
+                            }, { quoted: mek });
+                        }
+                        return;
                     }
                 }
 
-                await incrementStats(sanitizedNumber, 'messagesReceived');
-                if (isGroup) await incrementStats(sanitizedNumber, 'groupsInteracted');
+                // ========== NORMAL MESSAGE ==========
+                const from = mek.key.remoteJid;
+                const isGroup = from.endsWith("@g.us");
 
-                events.commands.map(async (evCmd) => {
-                    const ctx = { from, l, quoted: mek, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply, config, myquoted };
-                    if (body && evCmd.on === 'body') evCmd.function(conn, mek, m, ctx);
-                    else if (mek.q && evCmd.on === 'text') evCmd.function(conn, mek, m, ctx);
-                    else if ((evCmd.on === 'image' || evCmd.on === 'photo') && mek.type === 'imageMessage') evCmd.function(conn, mek, m, ctx);
-                    else if (evCmd.on === 'sticker' && mek.type === 'stickerMessage') evCmd.function(conn, mek, m, ctx);
+                const botJid = getBotJid(conn);
+                const sender = mek.key.fromMe ? botJid : (mek.key.participant || mek.key.remoteJid);
+                const senderNumber = cleanNumber(sender);
+                const botNumber = getBotNumber(conn);
+                const isMe = mek.key.fromMe || sender === botJid;
+                const isOwner = OWNER_NUMBER.includes(senderNumber) || isMe;
+
+                let groupMetadata = {};
+                let groupName = '';
+                let participants = [];
+                let groupAdmins = [];
+                let isBotAdmins = false;
+                let isAdmins = false;
+
+                if (isGroup) {
+                    try {
+                        groupMetadata = await getCachedGroupMetadata(conn, from);
+                        groupName = groupMetadata.subject || 'Unknown Group';
+                        participants = groupMetadata.participants || [];
+                        groupAdmins = participants
+                            .filter(p => p.admin === 'admin' || p.admin === 'superadmin')
+                            .map(p => p.id);
+
+                        const botRawNum = conn.user.id.split(':')[0].split('@')[0];
+                        const botLid = ((conn.authState?.creds?.me?.lid ||
+                            conn.authState?.creds?.account?.lid || '')
+                            .split('@')[0].split(':')[0]);
+
+                        isBotAdmins = groupAdmins.some(a => {
+                            const aNum = a.split('@')[0];
+                            return aNum === botRawNum || (botLid && botLid.length > 5 && aNum === botLid);
+                        });
+
+                        isAdmins = groupAdmins.includes(sender) ||
+                            groupAdmins.some(a => a.split('@')[0] === sender.split('@')[0]);
+                    } catch (err) {
+                        console.log('[ ❌ ] Group metadata error:', err.message);
+                        groupMetadata = { participants: [], subject: "Unknown" };
+                    }
+                }
+
+                const body = extractMessageBody(mek);
+                const isCmd = body.startsWith(prefix);
+
+                // ========== CUSTOM REACTION ==========
+                if (!mek.message?.reactionMessage && config.CUSTOM_REACT === "true") {
+                    const reactions = (config.CUSTOM_REACT_EMOJIS || "🥲,😂,👍🏻,🙂,😔").split(",");
+                    const randomReaction = reactions[Math.floor(Math.random() * reactions.length)];
+                    m.react(randomReaction);
+                }
+
+                if (mek.message?.reactionMessage) {
+                    handleReaction(m, true, senderNumber, botNumber, config);
+                }
+
+                // ========== BAN CHECK ==========
+                let bannedUsers = [];
+                try {
+                    if (fsSync.existsSync("./lib/ban.json")) {
+                        bannedUsers = JSON.parse(fsSync.readFileSync("./lib/ban.json", "utf-8"));
+                        if (!Array.isArray(bannedUsers)) bannedUsers = [];
+                    }
+                } catch (e) {
+                    bannedUsers = [];
+                }
+
+                const isBanned = bannedUsers.includes(senderNumber);
+                if (isBanned && !isOwner) {
+                    console.log(chalk.red(`[ 🚫 ] Banned user: ${senderNumber}`));
+                    return;
+                }
+
+                // ========== MODE PERMISSION ==========
+                if (from !== "status@broadcast") {
+                    const mode = config.MODE || "public";
+                    if (mode === "private" && !isOwner) return;
+                    if (mode === "inbox" && !isGroup && !isOwner) return;
+                    if (mode === "groups" && !isGroup && !isOwner) return;
+                }
+
+                // ========== COMMAND HANDLER ==========
+                if (isCmd) {
+                    const cmdName = body.slice(prefix.length).trim().split(" ")[0].toLowerCase();
+                    const events = require("./arslan");
+
+                    const cmd = events.commands.find(cmd =>
+                        cmd.pattern === cmdName || (cmd.alias && cmd.alias.includes(cmdName))
+                    );
+
+                    if (cmd) {
+                        if (cmd.react) {
+                            conn.sendMessage(from, { react: { text: cmd.react, key: mek.key } });
+                        }
+
+                        try {
+                            const args = body.trim().split(/ +/).slice(1);
+                            const q = args.join(" ");
+                            const text = args.join(" ");
+
+                            const context = {
+                                from,
+                                body,
+                                isCmd,
+                                command: cmdName,
+                                args,
+                                q,
+                                text,
+                                isGroup,
+                                sender,
+                                senderNumber,
+                                botNumber,
+                                pushname: mek.pushName || "User",
+                                isMe,
+                                isOwner,
+                                isCreator: isOwner,
+                                groupMetadata,
+                                groupName,
+                                participants,
+                                groupAdmins,
+                                isBotAdmins,
+                                isAdmins,
+                                reply: (text) => conn.sendMessage(from, { text }, { quoted: mek }),
+                                isReply: isReply,
+                                quoted: quoted,
+                                quotedMessage: quotedMessage,
+                                repliedType: repliedType,
+                                quotedMsgId: mek.message?.extendedTextMessage?.contextInfo?.stanzaId ||
+                                              mek.message?.imageMessage?.contextInfo?.stanzaId ||
+                                              mek.message?.videoMessage?.contextInfo?.stanzaId ||
+                                              mek.message?.audioMessage?.contextInfo?.stanzaId ||
+                                              mek.message?.documentMessage?.contextInfo?.stanzaId
+                            };
+
+                            await cmd.function(conn, mek, m, context);
+                        } catch (e) {
+                            console.error("[ ❌ ] Command error", e.message);
+                            if (isOwner) {
+                                await m.reply(`❌ Command Error: ${e.message}`);
+                            }
+                        }
+                    } else {
+                        if (config.SEND_UNKNOWN_COMMAND === "true" && isOwner) {
+                            await m.reply(`❌ Command not found: ${cmdName}\nUse ${prefix}menu to see all commands`);
+                        }
+                    }
+                }
+
+                // ========== BODY EVENTS ==========
+                const events = require("./arslan");
+                events.commands.forEach(async (command) => {
+                    if (body && command.on === "body") {
+                        try {
+                            await command.function(conn, mek, m, {
+                                from,
+                                body,
+                                isCmd,
+                                isGroup,
+                                sender,
+                                senderNumber,
+                                isOwner,
+                                isBotAdmins,
+                                isAdmins,
+                                reply: (text) => conn.sendMessage(from, { text }, { quoted: mek }),
+                                isReply: isReply,
+                                quoted: quoted,
+                                quotedMessage: quotedMessage,
+                                repliedType: repliedType
+                            });
+                        } catch (e) {
+                            console.error("[ ❌ ] Event error", e.message);
+                        }
+                    }
                 });
 
-            } catch (e) { arslanLog(`Message handler error: ${e.message}`, 'error'); }
+            } catch (e) {
+                console.error("[ ❌ ] Message handler error:", e.message);
+            }
         });
-
     } catch (err) {
         arslanLog(`ARSLAN-MD-MINI Pair error: ${err.message}`, 'error');
         if (res && !res.headersSent) return res.json({ error: 'Internal Server Error', details: err.message });
