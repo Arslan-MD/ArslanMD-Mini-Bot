@@ -43,8 +43,6 @@ const moment = require('moment-timezone');
 const prefix = config.PREFIX;
 const mode = config.MODE || config.WORK_TYPE;
 // ========== SETTINGS.JS SE VALUES ==========
-const prefix = config.PREFIX || '.';
-const mode = config.MODE || config.WORK_TYPE || 'public';
 const BOT_NAME = config.BOT_NAME || 'Aʀꜱʟᴀɴ-ᴍD';
 const OWNER_NAME = config.OWNER_NAME || 'ᴀʀꜱʟᴀɴ-ᴍᴅ';
 const OWNER_NUMBER = config.OWNER_NUMBER || ['923237045919'];
