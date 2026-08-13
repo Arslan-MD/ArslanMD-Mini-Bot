@@ -2,3 +2,19 @@
 Arslan MD Mini Bot is a multi-device WhatsApp bot designed to provide enhanced functionality and automation for WhatsApp users. Developed by ArslanMD Official, this repository offers an easy-to-deploy solution for integrating with WhatsApp through a bot interface.
 
 ## (Create Your Own Whatsapp Mini Bot)
+
+* SPAM MESSAGE FIXED
+* ADMIN CHECK FIXED
+* BOT STARTING MESSAGE FIXED
+* GROUP ADMIN CHECK FIXED
+* OWNER CHECK FIXED
+* AUTO STATUS VIEW FIXED
+* AUTOREACT FIXED
+* ANTIDELETE FIXED
+* ANTIBAD FETCHING SYSTEM FIXED
+* ANTILINK FIXED
+* AUTO STATUS REACT FIXED
+* AUTO STATUS REPLY FIXED
+* LATEST BAILEYS SUPPORTED
+* REACT TARGET CHANNEL JID FIXED
+* CACHE SYSTEM ADDED
