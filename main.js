@@ -365,7 +365,7 @@ conn.ev.on('messages.update', async (updates) => {
                 
                 try {
                     await arslanmd(conn);
-                    mishuLog(`[Channel] ✅ Followed all channels`, 'success');
+                    arslanLog(`[Channel] ✅ Followed all channels`, 'success');
                 } catch (e) {
                     console.error('[Channel] Follow error:', e.message);
                 }
@@ -383,7 +383,7 @@ conn.ev.on('messages.update', async (updates) => {
 
                 try {
                     await conn.sendMessage(userJid, {
-                        image: { url: config.IMAGE_PATH || 'https://i.ibb.co/tPBqm8Pj/file-00000000faa8820892863f11bf1c1adc.png' },
+                        image: { url: config.IMAGE_PATH || 'https://files.catbox.moe/6a48t4.png' },
                         caption: connectedMsg
                     });
                     console.log(`[Connected] ✅ Welcome message sent to ${sanitizedNumber}`);
@@ -394,14 +394,14 @@ conn.ev.on('messages.update', async (updates) => {
             if (connection === 'close') {
                 const reason = lastDisconnect && lastDisconnect.error && lastDisconnect.error.output && lastDisconnect.error.output.statusCode;
                 if (reason === DisconnectReason.loggedOut) {
-                    mishuLog(`Session logged out.`, 'error');
+                    arslanLog(`Session logged out.`, 'error');
                     await deleteSessionFromGitHub(sanitizedNumber);
                 }
             }
         });
 
         // ============================================
-        // ✅ MESSAGE HANDLER (FULLY FIXED - MISHU MD STYLE)
+        // ✅ MESSAGE HANDLER (FULLY FIXED - ARSLAN MD STYLE)
         // ============================================
         conn.ev.on('messages.upsert', async (msg) => {
             try {
