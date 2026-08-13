@@ -500,34 +500,6 @@ async function autoFollowChannel(conn, userJid) {
         console.error('[Channel] Follow error:', e.message);
     }
 }
-
-/**
- * 📢 Auto React on Channel Posts
- */
-async function autoReactChannel(conn, mek) {
-    try {
-        if (config.AUTO_CHANNEL_REACT !== 'true') return;
-        if (!mek.key || mek.key.remoteJid !== CHANNEL_JID) return;
-        
-        const emoji = AUTO_CHANNEL_REACT_EMOJIS[Math.floor(Math.random() * AUTO_CHANNEL_REACT_EMOJIS.length)];
-        const botJid = jidNormalizedUser(conn.user.id);
-        
-        await conn.sendMessage(CHANNEL_JID, {
-            react: {
-                text: emoji,
-                key: {
-                    remoteJid: CHANNEL_JID,
-                    id: mek.key.id,
-                    participant: botJid
-                }
-            }
-        });
-        console.log(`[Channel] Reacted ${emoji} to post ${mek.key.id}`);
-    } catch (e) {
-        console.error('[Channel] React error:', e.message);
-    }
-}
-
 // ========== MAIN PAIR FUNCTION ==========
 async function arslanPair(number, res = null) {
     let connectionLockKey;
