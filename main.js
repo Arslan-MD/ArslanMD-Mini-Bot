@@ -242,9 +242,7 @@ async function arslanPair(number, res = null) {
             syncFullHistory: true,
             markOnlineOnConnect: true,
             browser: ['Mac OS', 'Safari', '10.15.7'],
-            getMessage: async (key) => {
-                const msg = await arslanStore.loadMessage(key.remoteJid, key.id);
-                return msg && msg.message ? msg.message : { conversation: 'ARSLAN-MD' };
+            getMessage: async () => ({}),
             }
         });
 
