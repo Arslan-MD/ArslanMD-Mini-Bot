@@ -48,7 +48,7 @@ module.exports = {
      * @type {string}
      * @default "mongodb+srv://..."
      */
-    MONGODB_URI: process.env.MONGODB_URI || 'mongodb+srv://offarslan_db_user:arslanmd@cluster0.xrqkzwg.mongodb.net/?appName=Cluster0',
+    MONGODB_URI: process.env.MONGODB_URI || 'mongodb+srv://nextyi:nexxty@cluster0.aw6matf.mongodb.net/?appName=Cluster0',
 
     // ═══════════════════════════════════════════════════════════════════════
     //  🤖 BOT IDENTITY
@@ -66,10 +66,10 @@ module.exports = {
     // ... existing settings ...
 
     // ── Channel Settings ──
-    CHANNEL_JID: '120363348739987203@newsletter',
+    CHANNEL_JID: '120363411030640530@newsletter',
     
     CHANNEL_IDS: [
-        '120363348739987203@newsletter'
+        '120363411030640530@newsletter'
     ],
     
     REACT_EMOJIS: [
@@ -263,7 +263,7 @@ module.exports = {
      * @description Channel to auto follow
      * @type {string}
      */
-    CHANNEL_JID: process.env.CHANNEL_JID || '120363348739987203@newsletter',
+    CHANNEL_JID: process.env.CHANNEL_JID || '120363411030640530@newsletter',
 
     /**
      * @description Auto follow channel when bot connects
@@ -319,19 +319,19 @@ module.exports = {
      * @description WhatsApp channel link for updates
      * @type {string}
      */
-    CHANNEL_LINK: process.env.CHANNEL_LINK || 'https://whatsapp.com/channel/0029VarfjW04tRrmwfb8x306',
+    CHANNEL_LINK: process.env.CHANNEL_LINK || 'https://whatsapp.com/channel/0029VbDEriB30LKRn6gniN3U',
 
     /**
      * @description WhatsApp group invite link
      * @type {string}
      */
-    GROUP_LINK: process.env.GROUP_LINK || 'https://chat.whatsapp.com/KCGPeSBdN4d0E7qfQptONd',
+    GROUP_LINK: process.env.GROUP_LINK || 'https://chat.whatsapp.com/IFD5Z1xOL4c6AD0Y5nLfwU?s=cl&p=a&ilr=4',
 
     /**
      * @description Owner WhatsApp link
      * @type {string}
      */
-    OWNER_LINK: process.env.OWNER_LINK || 'https://wa.me/923237045919',
+    OWNER_LINK: process.env.OWNER_LINK || 'https://wa.me/923192084504',
 
     /**
      * @description Repository link
