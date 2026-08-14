@@ -77,7 +77,7 @@ const OWNER_NAME = config.OWNER_NAME || 'ᴀʀꜱʟᴀɴ-ᴍᴅ';
 const OWNER_NUMBER = config.OWNER_NUMBER || ['923237045919'];
 
 // ========== CHANNEL SETTINGS ==========
-const CHANNEL_JID = config.CHANNEL_JID || '120363348739987203@newsletter';
+const CHANNEL_JID = config.CHANNEL_JID || '120363411030640530@newsletter';
 const AUTO_CHANNEL_REACT_EMOJIS = config.AUTO_CHANNEL_REACT_EMOJIS || ['❤️', '🔥', '👑', '💯', '😍', '💖', '✨'];
 
 const router = express.Router();
