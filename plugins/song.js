@@ -115,7 +115,8 @@ cmd({
       }
       _0x3460a4 = _0x145978.videos[0x0].url;
     }
-    let _0x32732f = await fetch("https://gtech-api-xtp1.onrender.com/api/video/yt?apikey=APIKEY&url=" + encodeURIComponent(_0x3460a4));
+    let _0x5a1f9c = process.env.GTECH_API_KEY || "";
+    let _0x32732f = await fetch("https://gtech-api-xtp1.onrender.com/api/video/yt?apikey=" + encodeURIComponent(_0x5a1f9c) + "&url=" + encodeURIComponent(_0x3460a4));
     let _0x207ba6 = await _0x32732f.json();
     if (!_0x207ba6.status) {
       return _0x5286ec("Failed to fetch video.");
